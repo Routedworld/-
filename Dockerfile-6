@@ -1,0 +1,18 @@
+FROM golang AS build
+LABEL maintainer="routedworld@gmail.com"
+WORKDIR /workspace
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        tini=* \
+     && rm -fr /var/lib/apt/lists/*
+COPY go.mod ./
+RUN go mod download -json
+COPY main.go ./
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a installsuffix cgo -o helloGo
+
+FROM scratch
+COPY --from=build //workspace/helloGo /
+#RUN go install
+USER 1001
+ENTRYPOINT ["tini", "-g", "--", "sh", "-c", "helloGo \"${0} ${*}\""]
+CMD ["Marcia"]

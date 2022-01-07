@@ -1,0 +1,6 @@
+# Exclude everything default
+*
+
+# Include what is needed to build
+!main.go
+!go.mod
